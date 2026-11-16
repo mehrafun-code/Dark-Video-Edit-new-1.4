@@ -1,0 +1,18 @@
+name: Build Windows app
+on:
+  push: { branches: [main] }
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt pyinstaller
+      - run: >
+          pyinstaller --noconfirm --windowed --name DarkVideoEdit --icon app/assets/icon.ico
+          --add-data "app/ui;ui" --add-data "app/assets;assets"
+          --collect-all webview --collect-all imageio_ffmpeg --collect-all yt_dlp app/main.py
+      - uses: actions/upload-artifact@v4
+        with: { name: DarkVideoEdit-windows, path: dist/DarkVideoEdit }
